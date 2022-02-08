@@ -227,10 +227,10 @@ ORDER BY e.emp_no;
 
 ## Results
 
-### Deliverable 1
+### Table 4. The Number of Retiring Employees by Title
+![Table 6](/Analysis_Projects/Pewlett_Hackard_Analysis/retirement_titles_head.png)
+### Table 5. The Employees Eligible for the Mentorship Program
+![Table 5](/Analysis_Projects/Pewlett_Hackard_Analysis/mentorship_eligibility_head.png)
 
-### Deliverable 2
-
-### Deliverable 3
 
 ## Summary
