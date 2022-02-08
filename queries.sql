@@ -181,7 +181,21 @@ ON (de.dept_no = d.dept_no);
 -- COPY (select * from dept_info) TO 'C:\Users\jonat\UO_Bootcamp\Mod7\git_Pewlett-Hackard-Analysis\Pewlett-Hackard-Analysis\Analysis_Projects\Pewlett_Hackard_Analysis\Data\dept_info.csv'
 --    DELIMITER ',' CSV HEADER; 
 
+SELECT ce.emp_no,
+ce.first_name,
+ce.last_name,
+d.dept_name
+INTO dev_sales_dept_info
+FROM current_emp as ce
+INNER JOIN dept_employees AS de
+ON (ce.emp_no = de.emp_no)
+INNER JOIN departments AS d
+ON (de.dept_no = d.dept_no)
+WHERE de.dept_no IN ('d007', 'd005')
 
+SELECT * FROM dev_sales_dept_info
+ORDER by dept_name;
+SELECT * FROM dev_sales_dept_info
 
 
 
