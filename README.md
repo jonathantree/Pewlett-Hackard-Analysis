@@ -234,3 +234,21 @@ ORDER BY e.emp_no;
 
 
 ## Summary
+1. 72,458 are eligible for retirement and their positions will need to be filled. A breakdown of the number of positions by title is provided in the subsequent table.
+
+| count | title              |
+|-------|--------------------|
+| 25916 | Senior Engineer    |
+| 24926 | Senior Staff       |
+| 9285  | Engineer           |
+| 7636  | Staff              |
+| 3603  | Technique Leader   |
+| 1090  | Assistant Engineer |
+| 2     | Manager            |
+
+2. The total number of employees that were eligible for the mentorship program using the criteria stated above is only 1,549. This means that through the mentorship program, only 2% of the openings will be fulfilled if every employee on that list enters the program.
+
+##### The large gap of employees available internally to fill these positons means that different considerations need to be made to see if there are more employees that will be able to fill these roles
+
+
+
