@@ -24,62 +24,51 @@ Using these relationships, the following schema was developed to engineer a SQL 
 -- Creating tables for PH-EmployeeDB
 */
 
-drop table departments cascade;
 CREATE TABLE departments (
-     dept_no VARCHAR(4) NOT NULL,
-     dept_name VARCHAR(40) NOT NULL,
+     	dept_no VARCHAR(4) NOT NULL,
+     	dept_name VARCHAR(40) NOT NULL,
      PRIMARY KEY (dept_no),
      UNIQUE (dept_name)
 );
---copy public.departments (dept_no, dept_name) FROM 'C:/Users/jonat/UO_BOO~1/Mod7/GIT_PE~1/PEWLET~1/ANALYS~1/PEWLET~1/Data/DEPART~1.CSV' CSV HEADER QUOTE '\"' ESCAPE '''';
---drop table employees cascade;
 
 CREATE TABLE employees (
-	 emp_no INT NOT NULL,
-     birth_date DATE NOT NULL,
-     first_name VARCHAR NOT NULL,
-     last_name VARCHAR NOT NULL,
-     gender VARCHAR NOT NULL,
-     hire_date DATE NOT NULL,
+	emp_no INT NOT NULL,
+     	birth_date DATE NOT NULL,
+     	first_name VARCHAR NOT NULL,
+     	last_name VARCHAR NOT NULL,
+     	gender VARCHAR NOT NULL,
+     	hire_date DATE NOT NULL,
      PRIMARY KEY (emp_no)
 );
 
---drop table dept_manager cascade;
-
 CREATE TABLE dept_manager (
-	  dept_no VARCHAR(4) NOT NULL,
-    emp_no INT NOT NULL,
-    from_date DATE NOT NULL,
-    to_date DATE NOT NULL,
-	  FOREIGN KEY (emp_no) REFERENCES employees (emp_no),
-	  FOREIGN KEY (dept_no) REFERENCES departments (dept_no),
+	dept_no VARCHAR(4) NOT NULL,
+    	emp_no INT NOT NULL,
+    	from_date DATE NOT NULL,
+    	to_date DATE NOT NULL,
+    FOREIGN KEY (emp_no) REFERENCES employees (emp_no),
+    FOREIGN KEY (dept_no) REFERENCES departments (dept_no),
     PRIMARY KEY (emp_no, dept_no)
 );
-
---drop table salaries cascade;
 
 CREATE TABLE salaries (
 	  emp_no INT NOT NULL,
 	  salary INT NOT NULL,
 	  from_date DATE NOT NULL,
 	  to_date DATE NOT NULL,
-	  FOREIGN KEY (emp_no) REFERENCES employees (emp_no),
-	  PRIMARY KEY (emp_no)
+    FOREIGN KEY (emp_no) REFERENCES employees (emp_no),
+    PRIMARY KEY (emp_no)
 );
-
---drop table dept_employees cascade;
 
 CREATE TABLE dept_employees (
 	  emp_no INT NOT NULL,
 	  dept_no VARCHAR(4) NOT NULL,
 	  from_date DATE NOT NULL,
 	  to_date DATE NOT NULL,
-	  FOREIGN KEY (emp_no) REFERENCES employees (emp_no),
-  	FOREIGN KEY (dept_no) REFERENCES departments (dept_no),
-	  PRIMARY KEY (emp_no, dept_no)
+    FOREIGN KEY (emp_no) REFERENCES employees (emp_no),
+    FOREIGN KEY (dept_no) REFERENCES departments (dept_no),
+    PRIMARY KEY (emp_no, dept_no)
 );
-
---drop table titles cascade;
 
 CREATE TABLE titles (
 	  emp_no INT NOT NULL,
@@ -110,9 +99,9 @@ SELECT e.emp_no,
 INTO emp_info
 FROM employees as e
 INNER JOIN salaries as s
-ON (e.emp_no = s.emp_no)
+    ON (e.emp_no = s.emp_no)
 INNER JOIN dept_employees as de
-ON (e.emp_no = de.emp_no)
+    ON (e.emp_no = de.emp_no)
 WHERE (e.birth_date BETWEEN '1952-01-01' AND '1955-12-31')
     AND (e.hire_date BETWEEN '1985-01-01' AND '1988-12-31')
     AND (de.to_date = '9999-01-01');
@@ -138,10 +127,10 @@ SELECT  dm.dept_no,
         dm.to_date
 INTO manager_info
 FROM dept_manager AS dm
-    INNER JOIN departments AS d
-        ON (dm.dept_no = d.dept_no)
-    INNER JOIN current_emp AS ce
-        ON (dm.emp_no = ce.emp_no);
+INNER JOIN departments AS d
+     ON (dm.dept_no = d.dept_no)
+INNER JOIN current_emp AS ce
+     ON (dm.emp_no = ce.emp_no);
 ```
 First four results in Table 2.
 | dept_no | dept_name        | emp_no | last_name    | first_name | from_date  | to_date    |
@@ -162,9 +151,9 @@ SELECT ce.emp_no,
 INTO dept_info
 FROM current_emp as ce
 INNER JOIN dept_employees AS de
-	ON (ce.emp_no = de.emp_no)
+     ON (ce.emp_no = de.emp_no)
 INNER JOIN departments AS d
-	ON (de.dept_no = d.dept_no);
+     ON (de.dept_no = d.dept_no);
 
 SELECT ce.emp_no,
 	ce.first_name,
@@ -173,9 +162,9 @@ SELECT ce.emp_no,
 INTO dev_sales_dept_info
 FROM current_emp as ce
 INNER JOIN dept_employees AS de
-	ON (ce.emp_no = de.emp_no)
+     ON (ce.emp_no = de.emp_no)
 INNER JOIN departments AS d
-	ON (de.dept_no = d.dept_no)
+     ON (de.dept_no = d.dept_no)
 WHERE de.dept_no IN ('d007', 'd005')
 
 SELECT * FROM dev_sales_dept_info
@@ -193,6 +182,48 @@ First four results in Table 3.
 
 
 ## Challenge Overview
+Now that the database has been constructed with tables that are useful joining relevent information from the original six tables, the task is to create two new lists. These lists will contribute to developing a mentor program that eligible employees can be selected from and a enter mentorship with a retiring employee. 
+
+1. The first was to create a Retirement Titles table that holds all the titles of employees who were born between January 1, 1952 and December 31, 1955. Because some employees may have multiple titles in the database—for example, due to promotions, the `DISTINCT ON` statement was used to create a table that contains the most recent title of each employee. Then, the `COUNT()` function was used to create a table that has the number of retirement-age employees by most recent job title. Finally, because we want to include only current employees in our analysis, a final filter on the data that excluded those employees who have already left the company.
+
+```SQL
+SELECT DISTINCT ON (rt.emp_no) rt.emp_no,
+rt.first_name,
+rt.last_name,
+rt.title
+
+INTO unique_titles
+FROM retirement_titles AS rt
+WHERE (rt.to_date = '9999-01-01')
+ORDER BY rt.emp_no, rt.to_date DESC;
+
+SELECT COUNT(ut.title), ut.title
+INTO count_retiring_titles
+FROM unique_titles as ut
+GROUP BY ut.title
+ORDER BY ut.count DESC;
+```
+2. Create a mentorship-eligibility table that holds the current employees who were born between January 1, 1965 and December 31, 1965.
+
+```SQL
+SELECT DISTINCT ON(e.emp_no) e.emp_no,
+    	e.first_name,
+	e.last_name,
+    	e.birth_date,
+    	de.to_date,
+	de.from_date,
+    	t.title
+
+INTO mentorship_eligibility
+FROM employees as e
+INNER JOIN titles as t
+    ON (e.emp_no = t.emp_no)
+INNER JOIN dept_employees as de
+    ON (e.emp_no = de.emp_no)
+WHERE (de.to_date = '9999-01-01')
+    AND (e.birth_date BETWEEN '1965-01-01' AND '1965-12-31')
+ORDER BY e.emp_no;
+```
 
 ## Results
 
