@@ -236,6 +236,8 @@ ORDER BY e.emp_no;
 ## Summary
 1. 72,458 are eligible for retirement and their positions will need to be filled. A breakdown of the number of positions by title is provided in the subsequent table.
 
+### Table 6. Count of total retiring employee positions that will need to be fillled.
+
 | count | title              |
 |-------|--------------------|
 | 25916 | Senior Engineer    |
@@ -248,7 +250,64 @@ ORDER BY e.emp_no;
 
 2. The total number of employees that were eligible for the mentorship program using the criteria stated above is only 1,549. This means that through the mentorship program, only 2% of the openings will be fulfilled if every employee on that list enters the program.
 
-##### The large gap of employees available internally to fill these positons means that different considerations need to be made to see if there are more employees that will be able to fill these roles
+##### The large gap of employees available internally to fill these positons means that different considerations need to be made to see if there are more employees that will be able to fill these roles.
 
+### Additional Queries:
+Changing the eligibility for the mentorship program to a five year span `BETWEEN '1960-01-01' AND '1965-12-31'` rather than just a one year span yields a total of 93,756 employees that could enter the program. With these considerations for eligibility, there could be enough employees to fill the retiring positions and allow for some employees who may not be eligible for other reason other than their age such as qualifications. The following query generates this list:
+```SQL
+SELECT DISTINCT ON(e.emp_no) e.emp_no,
+    e.first_name,
+	e.last_name,
+    e.birth_date,
+    de.to_date,
+	de.from_date,
+    t.title
 
+INTO mentorship_eligibility_2
+FROM employees as e
+INNER JOIN titles as t
+ON (e.emp_no = t.emp_no)
+INNER JOIN dept_employees as de
+ON (e.emp_no = de.emp_no)
+WHERE (de.to_date = '9999-01-01')
+	AND (e.birth_date BETWEEN '1960-01-01' AND '1965-12-31')
+ORDER BY e.emp_no;
+```
+To better understand how many of these employees from this new eligibility currently occupy roles that qualify them for promotion, the following query was can be performed:
 
+```SQL
+SELECT COUNT(me.title), me.title
+INTO count_eligible_titles
+FROM mentorship_eligibility_2 as me
+GROUP BY me.title
+ORDER BY me.count DESC;
+```
+### Table 7. Number of employees for each title from the new eligibility list. 
+
+| count | title              |
+|-------|--------------------|
+| 33069 | Engineer           |
+| 31975 | Senior Staff       |
+| 9975  | Staff              |
+| 9374  | Senior Engineer    |
+| 4735  | Assistant Engineer |
+| 4618  | Technique Leader   |
+| 10    | Manager            |
+
+Table 6. 
+| count | title              |
+|-------|--------------------|
+| 25916 | Senior Engineer    |
+| 24926 | Senior Staff       |
+| 9285  | Engineer           |
+| 7636  | Staff              |
+| 3603  | Technique Leader   |
+| 1090  | Assistant Engineer |
+| 2     | Manager            |
+
+Conclusions:
+1. There could potentially enough engineers that could fill the senior engineer positions.
+2. There are not enough staff to fill the senior staff positions.
+3. There are not enough assistant engineers to fill the Engineer postion.
+
+There are an insufficient number of employees to fill every position and a massive external hiring effort will be needed to fill this void. 
