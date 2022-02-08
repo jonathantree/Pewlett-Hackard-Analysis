@@ -17,7 +17,7 @@ The main purpose of this project was to use PostgreSQL and PgAdmin 4 to engineer
 To develope the schema used in the database construction, a entity relationship diagram was built using [QuickDBD](https://app.quickdatabasediagrams.com/#/).
 ![ERD](/Analysis_Projects/Pewlett_Hackard_Analysis/EmployeeDB.png)
 
-Using these relationships, the following schema was developed to engineer a SQL database of these datain PostgreSQL. The employee number as the primary key.
+Using these relationships, the following schema was developed to engineer a SQL database of these data in PostgreSQL. The employee number as the primary key.
 
 ```SQL
 /*
@@ -89,8 +89,11 @@ CREATE TABLE titles (
     FOREIGN KEY (emp_no) REFERENCES employees (emp_no)
 );
 ```
+#### Retirement Eligibility
 
+```SQL
 
+``
 
 
 
